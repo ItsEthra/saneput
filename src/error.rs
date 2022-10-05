@@ -5,6 +5,7 @@ use std::{error, fmt::{Display, self}, io};
 pub enum ParseIntError {
     NegUnsigned,
     OutOfRange,
+    UnexpectedChar(char),
     Io(io::Error),
 }
 
@@ -19,6 +20,7 @@ impl Display for ParseIntError {
         match self {
             Self::NegUnsigned => write!(f, "Expected unsigned but found negative value"),
             Self::OutOfRange => write!(f, "Value is out of representable range"),
+            Self::UnexpectedChar(c) => write!(f, "Unexpected character `{c}`"),
             Self::Io(e) => e.fmt(f),
         }
     }

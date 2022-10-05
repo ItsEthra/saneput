@@ -24,7 +24,7 @@ macro_rules! impl_from_cin_prim {
                 type Error = ParseIntError;
 
                 fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self::Output, Self::Error> {
-                    let (mut b, mut v, mut neg) = (0, 0, None);
+                    let (mut b, mut v, mut neg): (_, $ty, _) = (0, 0, None);
 
                     loop {
                         cin.read(slice::from_mut(&mut b))?;
@@ -40,48 +40,48 @@ macro_rules! impl_from_cin_prim {
 
                         match radix.unwrap_or(ExpectedRadix::Dec) {
                             ExpectedRadix::Bin => {
-                                v *= 2;
-                                v += if b == b'1' || b == b'0' {
+                                v = v.checked_mul(2).ok_or(ParseIntError::OutOfRange)?;
+                                v = v.checked_add(if b == b'1' || b == b'0' {
                                     (b == b'1') as $ty 
                                 } else {
-                                    todo!("Unexpected char")
-                                };
+                                    return Err(ParseIntError::UnexpectedChar(b as char))
+                                }).ok_or(ParseIntError::OutOfRange)?;
                             },
                             ExpectedRadix::Oct => {
-                                v *= 8;
-                                v += if b >= b'0' && b <= b'7' {
+                                v = v.checked_mul(8).ok_or(ParseIntError::OutOfRange)?;
+                                v = v.checked_add(if b >= b'0' && b <= b'7' {
                                     (b - b'0') as $ty
                                 } else {
-                                    todo!("Unexpected char")
-                                };
+                                    return Err(ParseIntError::UnexpectedChar(b as char))
+                                }).ok_or(ParseIntError::OutOfRange)?;
                             },
                             ExpectedRadix::Dec => {
-                                v *= 10;
-                                v += if b >= b'0' && b <= b'9' {
+                                v = v.checked_mul(10).ok_or(ParseIntError::OutOfRange)?;
+                                v = v.checked_add(if b >= b'0' && b <= b'9' {
                                     (b - b'0') as $ty 
                                 } else {
-                                    todo!("Unexpected char")
-                                };
+                                    return Err(ParseIntError::UnexpectedChar(b as char))
+                                }).ok_or(ParseIntError::OutOfRange)?;
                             },
                             ExpectedRadix::Hex => {
-                                v *= 16;
-                                v += match b {
+                                v = v.checked_mul(16).ok_or(ParseIntError::OutOfRange)?;
+                                v = v.checked_add(match b {
                                     b'0'..=b'9' => (b - b'0') as $ty,
                                     b'a'..=b'f' => 10 + (b - b'a') as $ty,
                                     b'A'..=b'F' => 10 + (b - b'A') as $ty,
-                                    _ => todo!("Unexpected char")
-                                };
+                                    _ => return Err(ParseIntError::UnexpectedChar(b as char))
+                                }).ok_or(ParseIntError::OutOfRange)?;
                             },
                         }
 
                         if v >= <$ty>::MAX || v < <$ty>::MIN {
-                            todo!("Return an error")
+                            return Err(ParseIntError::OutOfRange);
                         }
                     }
 
                     Ok(if matches!(neg, Some(true)) {
                         if <$ty>::MIN == 0 {
-                            todo!("Can't negate unsigned");
+                            return Err(ParseIntError::NegUnsigned);
                         }
 
                         v.checked_neg().unwrap()
