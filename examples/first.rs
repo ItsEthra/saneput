@@ -11,6 +11,8 @@ fn read_i32(cin: &mut Stdin) -> io::Result<i32> {
         } else if b == b'-' && neg.is_none() {
             neg = Some(true);
             continue;
+        } else if b == b'_' {
+            continue;
         } else if !(b as char).is_numeric() {
             todo!("Return an error");
         }
@@ -22,7 +24,6 @@ fn read_i32(cin: &mut Stdin) -> io::Result<i32> {
             todo!("Return an error")
         }
     }
-
 
     // There is no way for `neg` to be `Some(false)` so its fine.
     Ok(v * neg.map(|_| -1).unwrap_or(1))
