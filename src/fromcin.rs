@@ -1,18 +1,25 @@
 use std::{slice, io::{Stdin, Read, self}};
 use crate::ParseIntError;
 
+/// Integer number system base.
 #[derive(Debug, Clone, Copy)]
 pub enum ExpectedRadix {
+    /// Binary
     Bin,
+    /// Octal
     Oct,
+    /// Decimal
     Dec,
+    /// Hexidecimal
     Hex,
 }
 
+/// Type that can be read from standrard input.
 pub trait FromStdin {
     type Output;
     type Error: From<io::Error>;
 
+    /// Reads the value from standrard input with optional radix.
     fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self::Output, Self::Error>;
 }
 
@@ -23,13 +30,15 @@ macro_rules! impl_from_cin_prim {
                 type Output = $ty;
                 type Error = ParseIntError;
 
+                // Parsing done manually in effort to avoid allocation, not sure if it's the best
+                // way to go about this.
                 fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self::Output, Self::Error> {
                     let (mut b, mut v, mut neg): (_, $ty, _) = (0, 0, None);
 
                     loop {
                         cin.read(slice::from_mut(&mut b))?;
 
-                        if b == b' ' || b == b'\n' {
+                        if b.is_ascii_control() || b == b' ' {
                             break;
                         } else if b == b'-' && neg.is_none() {
                             neg = Some(true);

@@ -10,6 +10,5 @@ fn main() {
 
     let v2 = u32::read_cin(&mut cin, Some(ExpectedRadix::Dec))
         .unwrap();
-
     dbg!(v2);
 }
