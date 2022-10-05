@@ -6,3 +6,5 @@ edition = "2021"
 repository = "https://github.com/ItsEthra/saeput"
 authors = ["ItsEthra"]
 
+[dependencies]
+saeput-proc = { path = "saeput-proc" }
