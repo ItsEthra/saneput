@@ -1,5 +1,5 @@
 use std::{slice, io::{Stdin, Read, self}};
-use crate::ParseIntError;
+use crate::{ParseIntError, ParseFloatError};
 
 /// Integer number system base.
 #[derive(Debug, Clone, Copy)]
@@ -15,24 +15,22 @@ pub enum ExpectedRadix {
 }
 
 /// Type that can be read from standrard input.
-pub trait FromStdin {
-    type Output;
+pub trait FromStdin: Sized {
     type Error: From<io::Error>;
 
     /// Reads the value from standrard input with optional radix.
-    fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self::Output, Self::Error>;
+    fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error>;
 }
 
 macro_rules! impl_from_cin_prim {
     ($($ty:ty),*) => {
         $(
             impl FromStdin for $ty {
-                type Output = $ty;
                 type Error = ParseIntError;
 
                 // Parsing done manually in effort to avoid allocation, not sure if it's the best
                 // way to go about this.
-                fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self::Output, Self::Error> {
+                fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
                     let (mut b, mut v, mut neg): (_, $ty, _) = (0, 0, None);
 
                     loop {
@@ -104,4 +102,48 @@ macro_rules! impl_from_cin_prim {
 }
 
 impl_from_cin_prim!(i8, u8, i16, u16, i32, u32, i64, u64, i128, u128);
+
+impl FromStdin for f32 {
+    type Error = ParseFloatError;
+
+    fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
+        assert!(radix.is_none(), "Float does not accept radix argument");
+
+        let mut buf = Vec::new();
+        let mut b = 0;
+        loop {
+            cin.read(slice::from_mut(&mut b))?;
+
+            if b.is_ascii_control() || b == b' ' {
+                break;
+            }
+            buf.push(b);
+        }
+
+        let s = String::from_utf8(buf)?;
+        Ok(s.parse()?)
+    }
+}
+
+impl FromStdin for f64 {
+    type Error = ParseFloatError;
+
+    fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
+        assert!(radix.is_none(), "Float does not accept radix argument");
+
+        let mut buf = Vec::new();
+        let mut b = 0;
+        loop {
+            cin.read(slice::from_mut(&mut b))?;
+
+            if b.is_ascii_control() || b == b' ' {
+                break;
+            }
+            buf.push(b);
+        }
+
+        let s = String::from_utf8(buf)?;
+        Ok(s.parse()?)
+    }
+}
 

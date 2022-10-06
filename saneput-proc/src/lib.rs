@@ -18,14 +18,14 @@ pub fn input(cnt: TokenStream) -> TokenStream {
                 quote! {
                     {
                         let mut _cin = ::std::io::stdin();
-                        <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, ::std::option::Option::Some(#radix)).unwrap()
+                        <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
                     }
                 }
             } else if gs.len() > 1 {
                 let tupitems = gs.into_iter()
                     .map(|Group { ty, radix }| {
                         quote! {
-                            <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, ::std::option::Option::Some(#radix)).unwrap()
+                            <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
                         }
                     });
 
@@ -88,17 +88,19 @@ fn parse_single_group(mut s: &str) -> Group {
         if s.is_empty() {
             s = "i32";
         }
-        Group { ty: s.parse().unwrap(), radix: quote!(::saneput::ExpectedRadix::Dec) }
+        Group { ty: s.parse().unwrap(), radix: quote!(::std::option::Option::None) }
     }
 }
 
 fn radix_from_str(s: &str) -> TokenStream2 {
-    match s {
+    let v = match s {
         "b" => quote!(::saneput::ExpectedRadix::Bin),
         "o" => quote!(::saneput::ExpectedRadix::Oct),
         "d" => quote!(::saneput::ExpectedRadix::Dec),
         "x" => quote!(::saneput::ExpectedRadix::Hex),
         _ => panic!("Invalid radix. Expected: `b`, `o`, `d`, `x`")
-    }
+    };
+
+    quote!(::std::option::Option::Some(#v))
 }
 
