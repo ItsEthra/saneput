@@ -1,7 +1,9 @@
+#![doc = include_str!("../README.md")]
+
 mod fromcin;
 pub use fromcin::*;
 
 mod error;
 pub use error::*;
 
-pub use saeput_proc::input;
+pub use saneput_proc::input;

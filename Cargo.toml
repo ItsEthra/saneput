@@ -1,5 +1,5 @@
 [package]
-name = "saeput"
+name = "saneput"
 description = "Sane reading of stdin"
 version = "0.1.0"
 edition = "2021"
@@ -7,4 +7,4 @@ repository = "https://github.com/ItsEthra/saeput"
 authors = ["ItsEthra"]
 
 [dependencies]
-saeput-proc = { path = "saeput-proc" }
+saneput-proc = { path = "saneput-proc" }

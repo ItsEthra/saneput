@@ -1,11 +1,16 @@
 use std::{error, fmt::{Display, self}, io};
 
+/// Error that can occur when parsing an integer.
 #[non_exhaustive]
 #[derive(Debug)]
 pub enum ParseIntError {
+    /// Tried to negate an unsigned value.
     NegUnsigned,
+    /// Parsed value exeeds type's representable range.
     OutOfRange,
+    /// Found an unexpected character.
     UnexpectedChar(char),
+    /// Input/Output error.
     Io(io::Error),
 }
 

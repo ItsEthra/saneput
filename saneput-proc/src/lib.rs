@@ -2,9 +2,11 @@ use proc_macro2::TokenStream as TokenStream2;
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
 
+/// Parses standrard input.
 #[proc_macro]
 pub fn input(cnt: TokenStream) -> TokenStream {
     let v = cnt.into_iter().next().expect("Input macro expects a string");
+
     match v {
         TokenTree::Literal(l) => {
             let s = l.to_string();
@@ -16,14 +18,14 @@ pub fn input(cnt: TokenStream) -> TokenStream {
                 quote! {
                     {
                         let mut _cin = ::std::io::stdin();
-                        <#ty as ::saeput::FromStdin>::read_cin(&mut _cin, ::std::option::Option::Some(#radix)).unwrap()
+                        <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, ::std::option::Option::Some(#radix)).unwrap()
                     }
                 }
             } else if gs.len() > 1 {
                 let tupitems = gs.into_iter()
                     .map(|Group { ty, radix }| {
                         quote! {
-                            <#ty as ::saeput::FromStdin>::read_cin(&mut _cin, ::std::option::Option::Some(#radix)).unwrap()
+                            <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, ::std::option::Option::Some(#radix)).unwrap()
                         }
                     });
 
@@ -68,6 +70,8 @@ fn parse_groups<'a>(s: &'a str) -> Vec<Group> {
             } else {
                 panic!("Unexpected `}}`");
             }
+        } else if current_group.is_none() {
+            panic!("Unexpected character: `{c}`");
         }
     }
 
@@ -84,16 +88,16 @@ fn parse_single_group(mut s: &str) -> Group {
         if s.is_empty() {
             s = "i32";
         }
-        Group { ty: s.parse().unwrap(), radix: quote!(::saeput::ExpectedRadix::Dec) }
+        Group { ty: s.parse().unwrap(), radix: quote!(::saneput::ExpectedRadix::Dec) }
     }
 }
 
 fn radix_from_str(s: &str) -> TokenStream2 {
     match s {
-        "b" => quote!(::saeput::ExpectedRadix::Bin),
-        "o" => quote!(::saeput::ExpectedRadix::Oct),
-        "d" => quote!(::saeput::ExpectedRadix::Dec),
-        "x" => quote!(::saeput::ExpectedRadix::Hex),
+        "b" => quote!(::saneput::ExpectedRadix::Bin),
+        "o" => quote!(::saneput::ExpectedRadix::Oct),
+        "d" => quote!(::saneput::ExpectedRadix::Dec),
+        "x" => quote!(::saneput::ExpectedRadix::Hex),
         _ => panic!("Invalid radix. Expected: `b`, `o`, `d`, `x`")
     }
 }
