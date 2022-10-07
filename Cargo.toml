@@ -9,7 +9,7 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
-saneput-proc = { path = "saneput-proc" }
+saneput-proc = "0.1.0"
 
 [workspace]
 members = ["saneput-proc"]
