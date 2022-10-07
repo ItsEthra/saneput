@@ -1,5 +1,5 @@
-use std::{slice, io::{Stdin, Read, self}};
 use crate::{ParseIntError, ParseFloatError};
+use std::{slice, io::{Stdin, Read, self}};
 
 /// Integer number system base.
 #[derive(Debug, Clone, Copy)]
@@ -34,7 +34,7 @@ macro_rules! impl_from_cin_prim {
                     let (mut b, mut v, mut neg): (_, $ty, _) = (0, 0, None);
 
                     loop {
-                        cin.read(slice::from_mut(&mut b))?;
+                        cin.read_exact(slice::from_mut(&mut b))?;
 
                         if b.is_ascii_control() || b == b' ' {
                             break;
@@ -56,7 +56,7 @@ macro_rules! impl_from_cin_prim {
                             },
                             ExpectedRadix::Oct => {
                                 v = v.checked_mul(8).ok_or(ParseIntError::OutOfRange)?;
-                                v = v.checked_add(if b >= b'0' && b <= b'7' {
+                                v = v.checked_add(if (b'0'..=b'7').contains(&b) {
                                     (b - b'0') as $ty
                                 } else {
                                     return Err(ParseIntError::UnexpectedChar(b as char))
@@ -64,7 +64,7 @@ macro_rules! impl_from_cin_prim {
                             },
                             ExpectedRadix::Dec => {
                                 v = v.checked_mul(10).ok_or(ParseIntError::OutOfRange)?;
-                                v = v.checked_add(if b >= b'0' && b <= b'9' {
+                                v = v.checked_add(if (b'0'..=b'9').contains(&b) {
                                     (b - b'0') as $ty 
                                 } else {
                                     return Err(ParseIntError::UnexpectedChar(b as char))
@@ -81,7 +81,7 @@ macro_rules! impl_from_cin_prim {
                             },
                         }
 
-                        if v >= <$ty>::MAX || v < <$ty>::MIN {
+                        if !(<$ty>::MIN..=<$ty>::MAX).contains(&v) {
                             return Err(ParseIntError::OutOfRange);
                         }
                     }
@@ -112,7 +112,7 @@ impl FromStdin for f32 {
         let mut buf = Vec::new();
         let mut b = 0;
         loop {
-            cin.read(slice::from_mut(&mut b))?;
+            cin.read_exact(slice::from_mut(&mut b))?;
 
             if b.is_ascii_control() || b == b' ' {
                 break;
@@ -134,7 +134,7 @@ impl FromStdin for f64 {
         let mut buf = Vec::new();
         let mut b = 0;
         loop {
-            cin.read(slice::from_mut(&mut b))?;
+            cin.read_exact(slice::from_mut(&mut b))?;
 
             if b.is_ascii_control() || b == b' ' {
                 break;

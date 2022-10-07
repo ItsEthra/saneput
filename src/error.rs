@@ -32,6 +32,7 @@ impl Display for ParseIntError {
 }
 impl error::Error for ParseIntError {}
 
+/// Error that occurs when parsing a floating point number.
 #[non_exhaustive]
 #[derive(Debug)]
 pub enum ParseFloatError {

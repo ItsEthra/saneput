@@ -2,7 +2,8 @@ use proc_macro2::TokenStream as TokenStream2;
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
 
-/// Parses standrard input.
+/// Parses standard input.
+/// Flushes standard out when called. For more info see crate's root.
 #[proc_macro]
 pub fn input(cnt: TokenStream) -> TokenStream {
     let v = cnt.into_iter().next().expect("Input macro expects a string");
@@ -16,10 +17,7 @@ pub fn input(cnt: TokenStream) -> TokenStream {
                 let Group { ty, radix } = gs.pop().unwrap();
 
                 quote! {
-                    {
-                        let mut _cin = ::std::io::stdin();
-                        <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
-                    }
+                    <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
                 }
             } else if gs.len() > 1 {
                 let tupitems = gs.into_iter()
@@ -30,18 +28,21 @@ pub fn input(cnt: TokenStream) -> TokenStream {
                     });
 
                 quote! {
-                    {
-                        let mut _cin = ::std::io::stdin();
-                        (
-                            #(#tupitems),*
-                        )
-                    }
+                    (
+                        #(#tupitems),*
+                    )
                 }
             } else {
                 panic!("Input string must contain at least one group")
             };
 
-            out.into()
+            (quote! {
+                {
+                    <::std::io::Stdout as ::std::io::Write>::flush(&mut std::io::stdout()).unwrap();
+                    let mut _cin = ::std::io::stdin();
+                    #out
+                }
+            }).into()
         },
         _ => panic!("Input macro expects a string")
     }

@@ -12,7 +12,8 @@ let value = input!("{}");
 // You can also specify the radix input string should be in. Though no prefixes are allowed.
 // `b` - binary, `o` - octal, `d` - decimal(defualt), `x` - hexidecimal.
 // `{:x}` - is called a group.
-let thing = input!("{:x}");
+// Accepted types are all integers types, `f32` and `f64`.
+let thing: u64 = input!("{u64:x}");
 // > ff
 // thing = 255
 
@@ -22,8 +23,8 @@ let thing = input!("{:x}");
 // > 1
 // > 2
 let (a, b): (i32, u32) = input!("{i32}{u32}");
-/*                                   ^
-                                     |
+/*                                   ^^
+                                     ||
                             Notice lack of space.
 All groups must follow each other with no characters in between. */
 ```
