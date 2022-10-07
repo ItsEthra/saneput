@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use proc_macro2::TokenStream as TokenStream2;
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
@@ -13,27 +15,29 @@ pub fn input(cnt: TokenStream) -> TokenStream {
             let s = l.to_string();
             let mut gs = parse_groups(&s[1..][..s.len() - 2]);
 
-            let out = if gs.len() == 1 {
-                let Group { ty, radix } = gs.pop().unwrap();
+            let out = match gs.len().cmp(&1) {
+                Ordering::Equal => {
+                    let Group { ty, radix } = gs.pop().unwrap();
 
-                quote! {
-                    <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
-                }
-            } else if gs.len() > 1 {
-                let tupitems = gs.into_iter()
-                    .map(|Group { ty, radix }| {
-                        quote! {
-                            <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
-                        }
-                    });
+                    quote! {
+                        <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
+                    }
+                },
+                Ordering::Greater => {
+                    let tupitems = gs.into_iter()
+                        .map(|Group { ty, radix }| {
+                            quote! {
+                                <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
+                            }
+                        });
 
-                quote! {
-                    (
-                        #(#tupitems),*
-                    )
-                }
-            } else {
-                panic!("Input string must contain at least one group")
+                    quote! {
+                        (
+                            #(#tupitems),*
+                        )
+                    }
+                },
+                _ => panic!("Input string must contain at least one group"),
             };
 
             (quote! {
@@ -53,7 +57,7 @@ struct Group {
     radix: TokenStream2,
 }
 
-fn parse_groups<'a>(s: &'a str) -> Vec<Group> {
+fn parse_groups(s: &str) -> Vec<Group> {
     let mut current_group = None;
     let mut groups = vec![];
 
