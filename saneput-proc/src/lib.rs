@@ -95,10 +95,10 @@ fn parse_single_group(mut s: &str) -> Group {
 
 fn radix_from_str(s: &str) -> TokenStream2 {
     let v = match s {
-        "b" => quote!(::saneput::ExpectedRadix::Bin),
-        "o" => quote!(::saneput::ExpectedRadix::Oct),
-        "d" => quote!(::saneput::ExpectedRadix::Dec),
-        "x" => quote!(::saneput::ExpectedRadix::Hex),
+        "b" => quote!(2),
+        "o" => quote!(8),
+        "d" => quote!(10),
+        "x" => quote!(16),
         _ => panic!("Invalid radix. Expected: `b`, `o`, `d`, `x`")
     };
 

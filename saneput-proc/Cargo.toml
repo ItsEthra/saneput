@@ -1,8 +1,9 @@
 [package]
 name = "saneput-proc"
-version = "0.2.0"
+description = "Procedural macro for saneput"
+version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/ItsEthra/saeput"
+repository = "https://github.com/ItsEthra/saneput"
 authors = ["ItsEthra"]
 
 [lib]

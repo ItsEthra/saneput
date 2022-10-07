@@ -1,9 +1,9 @@
 [package]
 name = "saneput"
-description = "Sane reading of stdin"
-version = "0.2.0"
+description = "Sane input reading library"
+version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/ItsEthra/saeput"
+repository = "https://github.com/ItsEthra/saneput"
 authors = ["ItsEthra"]
 readme = "README.md"
 

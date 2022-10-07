@@ -4,22 +4,12 @@ pub use saneput_proc::input;
 
 use std::{slice, io::{Stdin, Read}, num::{ParseIntError, ParseFloatError}};
 
-#[derive(Debug, Clone, Copy)]
-#[doc(hidden)]
-#[repr(u32)]
-pub enum ExpectedRadix {
-    Bin = 2,
-    Oct = 8,
-    Dec = 10,
-    Hex = 16,
-}
-
 /// Type that can be read from standrard input.
 pub trait FromStdin: Sized {
     type Error: std::error::Error;
 
     /// Reads the value from standrard input with optional radix.
-    fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error>;
+    fn read_cin(cin: &mut Stdin, radix: Option<u32>) -> Result<Self, Self::Error>;
 }
 
 macro_rules! impl_from_cin_prim {
@@ -30,7 +20,7 @@ macro_rules! impl_from_cin_prim {
 
                 // Parsing done manually in effort to avoid allocation, not sure if it's the best
                 // way to go about this.
-                fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
+                fn read_cin(cin: &mut Stdin, radix: Option<u32>) -> Result<Self, Self::Error> {
                     let mut buf = Vec::new();
                     let mut b = 0;
                     loop {
@@ -43,7 +33,7 @@ macro_rules! impl_from_cin_prim {
                     }
 
                     let s = String::from_utf8(buf).unwrap();
-                    <$ty>::from_str_radix(&s, radix.unwrap_or(ExpectedRadix::Dec) as u32)
+                    <$ty>::from_str_radix(&s, radix.unwrap_or(10))
                 }
             }
         )*
@@ -56,7 +46,7 @@ macro_rules! impl_from_cin_float {
             impl FromStdin for $ty {
                 type Error = ParseFloatError;
 
-                fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
+                fn read_cin(cin: &mut Stdin, radix: Option<u32>) -> Result<Self, Self::Error> {
                     assert!(radix.is_none(), concat!(stringify!($ty), " does not accept radix argument"));
 
                     let mut buf = Vec::new();
