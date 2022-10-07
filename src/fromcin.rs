@@ -1,5 +1,5 @@
-use crate::{ParseIntError, ParseFloatError};
-use std::{slice, io::{Stdin, Read, self}};
+use std::{slice, io::{Stdin, Read}, num::ParseFloatError};
+use crate::ParseIntError;
 
 /// Integer number system base.
 #[derive(Debug, Clone, Copy)]
@@ -16,7 +16,7 @@ pub enum ExpectedRadix {
 
 /// Type that can be read from standrard input.
 pub trait FromStdin: Sized {
-    type Error: From<io::Error>;
+    type Error: std::error::Error;
 
     /// Reads the value from standrard input with optional radix.
     fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error>;
@@ -107,12 +107,12 @@ impl FromStdin for f32 {
     type Error = ParseFloatError;
 
     fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
-        assert!(radix.is_none(), "Float does not accept radix argument");
+        assert!(radix.is_none(), "f32 does not accept radix argument");
 
         let mut buf = Vec::new();
         let mut b = 0;
         loop {
-            cin.read_exact(slice::from_mut(&mut b))?;
+            cin.read_exact(slice::from_mut(&mut b)).unwrap();
 
             if b.is_ascii_control() || b == b' ' {
                 break;
@@ -120,7 +120,7 @@ impl FromStdin for f32 {
             buf.push(b);
         }
 
-        let s = String::from_utf8(buf)?;
+        let s = String::from_utf8(buf).unwrap();
         Ok(s.parse()?)
     }
 }
@@ -129,12 +129,12 @@ impl FromStdin for f64 {
     type Error = ParseFloatError;
 
     fn read_cin(cin: &mut Stdin, radix: Option<ExpectedRadix>) -> Result<Self, Self::Error> {
-        assert!(radix.is_none(), "Float does not accept radix argument");
+        assert!(radix.is_none(), "f64 does not accept radix argument");
 
         let mut buf = Vec::new();
         let mut b = 0;
         loop {
-            cin.read_exact(slice::from_mut(&mut b))?;
+            cin.read_exact(slice::from_mut(&mut b)).unwrap();
 
             if b.is_ascii_control() || b == b' ' {
                 break;
@@ -142,7 +142,7 @@ impl FromStdin for f64 {
             buf.push(b);
         }
 
-        let s = String::from_utf8(buf)?;
+        let s = String::from_utf8(buf).unwrap();
         Ok(s.parse()?)
     }
 }

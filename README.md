@@ -1,5 +1,5 @@
 # Saneput
-Rust input library
+Rust sane input reading library
 
 # Usage
 ```rust

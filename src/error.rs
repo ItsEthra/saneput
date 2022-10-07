@@ -1,4 +1,4 @@
-use std::{error, fmt::{Display, self}, io, string::FromUtf8Error};
+use std::{error, fmt::{Display, self}, io};
 
 /// Error that can occur when parsing an integer.
 #[non_exhaustive]
@@ -32,43 +32,3 @@ impl Display for ParseIntError {
 }
 impl error::Error for ParseIntError {}
 
-/// Error that occurs when parsing a floating point number.
-#[non_exhaustive]
-#[derive(Debug)]
-pub enum ParseFloatError {
-    /// Float parsing from string gone wrong.
-    Parse(std::num::ParseFloatError),
-    /// Input/Output error.
-    Io(io::Error),
-    /// Float string was not a utf8 sequence.
-    NotUtf8(FromUtf8Error),
-}
-
-impl From<io::Error> for ParseFloatError {
-    fn from(value: io::Error) -> Self {
-        Self::Io(value)
-    }
-}
-
-impl From<FromUtf8Error> for ParseFloatError {
-    fn from(value: FromUtf8Error) -> Self {
-        Self::NotUtf8(value)
-    }
-}
-
-impl From<std::num::ParseFloatError> for ParseFloatError {
-    fn from(value: std::num::ParseFloatError) -> Self {
-        Self::Parse(value)
-    }
-}
-
-impl Display for ParseFloatError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Parse(e) => e.fmt(f),
-            Self::NotUtf8(e) => e.fmt(f),
-            Self::Io(e) => e.fmt(f),
-        }
-    }
-}
-impl error::Error for ParseFloatError {}
