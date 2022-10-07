@@ -5,6 +5,7 @@ version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/ItsEthra/saneput"
 authors = ["ItsEthra"]
+license = "MIT"
 readme = "README.md"
 
 [dependencies]

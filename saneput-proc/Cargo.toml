@@ -4,7 +4,7 @@ description = "Procedural macro for saneput"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/ItsEthra/saneput"
-license = "../LICENSE"
+license = "MIT"
 authors = ["ItsEthra"]
 
 [lib]
