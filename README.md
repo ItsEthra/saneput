@@ -27,7 +27,10 @@ let (a, b): (i32, u32) = input!("{i32}{u32}");
                                      ||
                             Notice lack of space.
 All groups must follow each other with no characters in between. */
+
+// For more comprehensive example take a look at `examples/grid.rs`
 ```
+
 
 # Installation
 ```toml
