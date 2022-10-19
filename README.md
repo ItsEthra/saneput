@@ -3,7 +3,7 @@ Rust sane input reading library
 
 # Usage
 ```rust
-# use saneput::input;
+use saneput::input;
 // By default type `input` parses is `i32`.
 let value = input!("{}");
 // > -15
