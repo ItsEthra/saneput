@@ -8,7 +8,10 @@ use quote::quote;
 /// Flushes standard out when called. For more info see crate's root.
 #[proc_macro]
 pub fn input(cnt: TokenStream) -> TokenStream {
-    let v = cnt.into_iter().next().expect("Input macro expects a string");
+    let v = cnt
+        .into_iter()
+        .next()
+        .expect("Input macro expects a string");
 
     match v {
         TokenTree::Literal(l) => {
@@ -22,21 +25,20 @@ pub fn input(cnt: TokenStream) -> TokenStream {
                     quote! {
                         <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
                     }
-                },
+                }
                 Ordering::Greater => {
-                    let tupitems = gs.into_iter()
-                        .map(|Group { ty, radix }| {
-                            quote! {
-                                <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
-                            }
-                        });
+                    let tupitems = gs.into_iter().map(|Group { ty, radix }| {
+                        quote! {
+                            <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix).unwrap()
+                        }
+                    });
 
                     quote! {
                         (
                             #(#tupitems),*
                         )
                     }
-                },
+                }
                 _ => panic!("Input string must contain at least one group"),
             };
 
@@ -46,9 +48,10 @@ pub fn input(cnt: TokenStream) -> TokenStream {
                     let mut _cin = ::std::io::stdin();
                     #out
                 }
-            }).into()
-        },
-        _ => panic!("Input macro expects a string")
+            })
+            .into()
+        }
+        _ => panic!("Input macro expects a string"),
     }
 }
 
@@ -64,7 +67,7 @@ fn parse_groups(s: &str) -> Vec<Group> {
     for (i, c) in s.char_indices() {
         if c == '{' {
             if current_group.is_none() {
-                current_group = Some(i+1);
+                current_group = Some(i + 1);
             } else {
                 panic!("Unexpected `{{`");
             }
@@ -88,12 +91,18 @@ fn parse_single_group(mut s: &str) -> Group {
         if ty.is_empty() {
             ty = "i32";
         }
-        Group { ty: ty.parse().unwrap(), radix: radix_from_str(radix) }
+        Group {
+            ty: ty.parse().unwrap(),
+            radix: radix_from_str(radix),
+        }
     } else {
         if s.is_empty() {
             s = "i32";
         }
-        Group { ty: s.parse().unwrap(), radix: quote!(::std::option::Option::None) }
+        Group {
+            ty: s.parse().unwrap(),
+            radix: quote!(::std::option::Option::None),
+        }
     }
 }
 
@@ -103,9 +112,8 @@ fn radix_from_str(s: &str) -> TokenStream2 {
         "o" => quote!(8),
         "d" => quote!(10),
         "x" => quote!(16),
-        _ => panic!("Invalid radix. Expected: `b`, `o`, `d`, `x`")
+        _ => panic!("Invalid radix. Expected: `b`, `o`, `d`, `x`"),
     };
 
     quote!(::std::option::Option::Some(#v))
 }
-
