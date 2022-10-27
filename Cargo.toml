@@ -1,7 +1,7 @@
 [package]
 name = "saneput"
 description = "Sane input reading library"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/ItsEthra/saneput"
 authors = ["ItsEthra"]
@@ -9,7 +9,7 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
-saneput-proc = "0.1.0"
+saneput-proc = "0.2" 
 
 [workspace]
 members = ["saneput-proc"]

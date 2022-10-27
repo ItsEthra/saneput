@@ -1,10 +1,60 @@
-use std::cmp::Ordering;
-
 use proc_macro2::TokenStream as TokenStream2;
 use proc_macro::{TokenStream, TokenTree};
+use std::cmp::Ordering;
 use quote::quote;
 
 /// Parses standard input.
+/// Flushes standard out when called. For more info see crate's root.
+#[proc_macro]
+pub fn input_checked(cnt: TokenStream) -> TokenStream {
+    let v = cnt
+        .into_iter()
+        .next()
+        .expect("Input macro expects a string");
+
+    match v {
+        TokenTree::Literal(l) => {
+            let s = l.to_string();
+            let mut gs = parse_groups(&s[1..][..s.len() - 2]);
+
+            let out = match gs.len().cmp(&1) {
+                Ordering::Equal => {
+                    let Group { ty, radix } = gs.pop().unwrap();
+
+                    quote! {
+                        <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix)
+                    }
+                }
+                Ordering::Greater => {
+                    let tupitems = gs.into_iter().map(|Group { ty, radix }| {
+                        quote! {
+                            <#ty as ::saneput::FromStdin>::read_cin(&mut _cin, #radix)
+                        }
+                    });
+
+                    quote! {
+                        (
+                            #(#tupitems),*
+                        )
+                    }
+                }
+                _ => panic!("Input string must contain at least one group"),
+            };
+
+            (quote! {
+                {
+                    <::std::io::Stdout as ::std::io::Write>::flush(&mut std::io::stdout()).unwrap();
+                    let mut _cin = ::std::io::stdin();
+                    #out
+                }
+            })
+            .into()
+        }
+        _ => panic!("Input macro expects a string"),
+    }
+}
+
+/// Parses standard input, panicing when error occurs.
 /// Flushes standard out when called. For more info see crate's root.
 #[proc_macro]
 pub fn input(cnt: TokenStream) -> TokenStream {

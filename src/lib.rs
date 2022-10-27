@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 
-pub use saneput_proc::input;
+pub use saneput_proc::{input, input_checked};
 
 use std::{
     num::{ParseFloatError, ParseIntError},
